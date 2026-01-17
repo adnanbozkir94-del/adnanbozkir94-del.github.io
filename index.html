@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Araba Oyunu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: white;
+    }
+
+    #menu {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    button {
+      padding: 15px 40px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #game {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- GİRİŞ MENÜSÜ -->
+  <div id="menu">
+    <h1>Cihaz Seç</h1>
+    <button onclick="startGame('touch')">📱 Dokunmatik</button>
+    <button onclick="startGame('keyboard')">💻 Bilgisayar</button>
+  </div>
+
+  <!-- OYUN ALANI -->
+  <div id="game"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="game.js"></script>
+
+</body>
+</html>
