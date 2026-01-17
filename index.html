@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>3D Araba Oyunu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial;
+    background: white;
+  }
+
+  #menu {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    background: white;
+    z-index: 10;
+  }
+
+  button {
+    font-size: 22px;
+    padding: 15px 40px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body tabindex="0">
+
+<div id="menu">
+  <h1>Cihaz Seç</h1>
+  <button onclick="start('touch')">📱 Dokunmatik</button>
+  <button onclick="start('keyboard')">💻 Bilgisayar</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<script>
+let scene, camera, renderer, car;
+let mode = "";
+let speed = 0;
+
+function start(selectedMode) {
+  mode = selectedMode;
+  document.getElementById("menu").remove();
+  init();
+}
+
+function init() {
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+  );
+
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Zemin
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(200, 200),
+    new THREE.MeshBasicMaterial({ color: 0x555555 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+
+  // Araba (küp)
+  car = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.5, 2),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+  );
+  car.position.y = 0.25;
+  scene.add(car);
+
+  camera.position.set(0, 3, 6);
+
+  // KONTROLLER
+  if (mode === "keyboard") {
+    window.addEventListener("keydown", e => {
+      if (e.key === "w") speed = 0.15;
+      if (e.key === "s") speed = -0.1;
+      if (e.key === "a") car.position.x -= 0.2;
+      if (e.key === "d") car.position.x += 0.2;
+    });
+
+    window.addEventListener("keyup", () => speed = 0);
+  }
+
+  if (mode === "touch") {
+    window.addEventListener("touchmove", e => {
+      e.preventDefault();
+      const t = e.touches[0];
+      car.position.x = (t.clientX / window.innerWidth - 0.5) * 10;
+      speed = 0.1;
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => speed = 0);
+  }
+
+  animate();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  car.position.z -= speed;
+
+  // Kamera arabayı takip eder
+  camera.position.x = car.position.x;
+  camera.position.z = car.position.z + 6;
+  camera.lookAt(car.position);
+
+  renderer.render(scene, camera);
+}
+
+// Ekran değişince bozulmasın
+window.addEventListener("resize", () => {
+  if (!camera) return;
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>
